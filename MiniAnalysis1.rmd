@@ -1,6 +1,7 @@
 ---
 title: "Mini Data-Analysis Deliverable 1"
-output: html_document
+output:github_doucment
+    df_print: paged
 ---
 
 # Welcome to your (maybe) first-ever data analysis project!
@@ -80,10 +81,10 @@ And that is exactly the first thing that you will do!
 
 <!-------------------------- Start your work below ---------------------------->
 
-1: CHOICE_1\_HERE\
-2: CHOICE_2\_HERE\
-3: CHOICE_3\_HERE\
-4: CHOICE_4\_HERE
+1: CHOICE 1: cancer_sample 
+2: CHOICE 2: steam_games
+3: CHOICE 3: flow_sample
+4: CHOICE_4: Vancouver_trees
 
 <!----------------------------------------------------------------------------->
 
@@ -91,26 +92,59 @@ And that is exactly the first thing that you will do!
 
 *Hint:* This is one of those times when you should think about the cleanliness of your analysis. I added a single code chunk for you below, but do you want to use more than one? Would you like to write more comments outside of the code chunk?
 
-<!-------------------------- Start your work below ---------------------------->
+<!-------------------------- Start your work below 
+For this project, I am first deciding the first four datasets to explore my interest as:
+1.cancer_sample
+2.vancouver_trees
+3.flow_sample
+4.buildings_permits
+---------------------------->
 
 ```{r}
 ### EXPLORE HERE ###
-steam_games
+datateachr::cancer_sample
+head(cancer_sample)
+class(cancer_sample)
+summary(cancer_sample)
+
+datateachr::flow_sample
+head(flow_sample)
+class(flow_sample)
+summary(flow_sample)
+
+datateachr::vancouver_trees
+head(vancouver_trees)
+class(vancouver_trees)
+summary(vancouver_trees)
+
+
+datateachr::building_permits
+head(building_permits)
+class(building_permits)
+summary(building_permits)
 ```
 
-<!----------------------------------------------------------------------------->
 
-1.3 Now that you've explored the 4 datasets that you were initially most interested in, let's narrow it down to 2. What lead you to choose these 2? Briefly explain your choices below, and feel free to include any code in your explanation.
+`<!----------------------------------------------------------------------------->
 
-<!-------------------------- Start your work below ---------------------------->
+1.3 Now that you've explored the 4 data sets that you were initially most interested in, let's narrow it down to 2. What lead you to choose these 2? Briefly explain your choices below, and feel free to include any code in your explanation.
+
+<!-------------------------- Start your work below 
+My choice is vancouver_trees in which I am interested as I love trees and the topic itself intrudes me, there are also variables of curb which has binary response and will be useful to run logistic regression.
+I also want to work with the  cancer_sample data sets, I chose this  because I want to work with occupancy survey in future for my PhD thesis, whose response is 0 or 1 (binary categorical). 
+.---------------------------->
+ 
 
 <!----------------------------------------------------------------------------->
 
 1.4 Time for the final decision! Going back to the beginning, it's important to have an *end goal* in mind. For example, if I had chosen the `titanic` dataset for my project, I might've wanted to explore the relationship between survival and other variables. Try to think of 1 research question that you would want to answer with each dataset. Note them down below, and make your final choice based on what seems more interesting to you!
 
-<!-------------------------- Start your work below ---------------------------->
+<!-------------------------- Start your work below
 
-<!----------------------------------------------------------------------------->
+For the vancouver_trees dataset, I want to explore if the height of the trees have any relationship with curb used.
+For next dataset, I want to explore the relationship between diagnosis in which I want to explore if the diagnosis of cancer with being B or M is determined by area where, diagnosis as dependent (categorical) variable and area as independent variable.---------------------------->
+ 
+<!---------------------------------------------------------------------------->
 
 # Important note
 
@@ -135,15 +169,61 @@ If we rewind and go back to the learning objectives, you'll see that by the end 
 
 2.2 For each of the 4 exercises that you complete, provide a *brief explanation* of why you chose that exercise in relation to your data (in other words, why does it make sense to do that?), and sufficient comments for a reader to understand your reasoning and code.
 
-<!-------------------------- Start your work below ---------------------------->
+<!-------------------------- Start your work below 
+1. I want to explore the variable height range and see if the data is highly skewed and see if there are any outliers in the data. 
 
-<!----------------------------------------------------------------------------->
+```{r}
+#First I want to understand the data and see the summary of the data set
+vancouver_trees <- as.tibble(datateachr::vancouver_trees)
+vancouver_trees$height_range_id <- as.factor(vancouver_trees$height_range_id)
 
+#I want to print the distribution of the diameter in the data 
+ggplot(vancouver_trees, aes(height_range_id)) +
+  geom_bar(stata="identity", fill="dark green", color= "black")
+
+```
+
+2. Now, I want to explore how many missing data are there in the the curb variable and root barrier that I am interested in. This is also important as I may have to decide to deal with the missing values in required way. If you are replicating this project, don't miss doing it!
+
+```{r}
+#Check if there are many missing values 
+any(is.na(vancouver_trees$curb))
+any(is.na(vancouver_trees$root_barrier))
+
+```
+There are no missing data in the two predictor variables that I am interested in. Hence I am not worried now.
+
+3. I want to conduct a regression and see if height of the trees is affected by the curb and the root barrier. But I am not sure if curb and root barrier are correlated to each other. If so, I may have to reconsider thinking of choosing only one of them to avoid collinearity. Since both variables are categorical that too nominal, I am conducting a chi square test.
+```{r}
+test <-chisq.test(vancouver_trees$curb, vancouver_trees$root_barrier)
+test
+ggplot(aes(curb), data = vancouver_trees) + 
+  geom_bar()
+  ggplot(aes(root_barrier), data = vancouver_trees)+ 
+  geom_bar()
+  
+```
+Since, both the value of p is 0.00408 which is less than 0.05, thus it is seen that the two explanatory variables are related to each other and I may have to omit one of them. I decide to omit curb and keep root_barriers. I have plotted the number of trees with root barrier and curb in 2 different plots.
+4. I want to create subset of my the genus dataset to see if there is any relation of height and root barrier of Acer genus and Quercus species as the roots of Acer trees can spread out 12 feet wide and upto 3 feet deep and the root of Quercus goes 3-7 times deeper tha  their part above soil.
+```{r}
+datateachr::vancouver_trees
+#Creating subset of Acer Genus
+Acer_subset <- filter(vancouver_trees, genus_name == "ACER")
+#Creating subset of Quercus genus
+Quercus_subset <- filter(vancouver_trees, genus_name == "QUERCUS")
+```
+
+---------------------------------------------------------->
 # Task 3: Write your research questions (5 points)
 
 So far, you have chosen a dataset and gotten familiar with it through exploring the data. Now it's time to figure out 4 research questions that you would like to answer with your data! Write the 4 questions and any additional comments at the end of this deliverable. These questions are not necessarily set in stone - TAs will review them and give you feedback; therefore, you may choose to pursue them as they are for the rest of the project, or make modifications!
 
-<!--- *****START HERE***** --->
+<!--- 
+Question 1: How does diameter differ in two genus: Acer and Quercus?
+Question 2: What are the diameters of the tree that are out of the range of most of the data in quercus genus?
+Question 3: Is the diameter of Quercus species significantly affected by curb?
+Question 4: Is the diameter of one height class significantly different than other height classes? --->
+
 
 # Task 4: Process and summarize your data (13 points)
 
@@ -169,18 +249,110 @@ Ensure that the output of each operation is printed!
 7.  Make a graph where it makes sense to customize the alpha transparency.
 8.  Create 3 histograms out of summarized variables, with each histogram having different sized bins. Pick the "best" one and explain why it is the best.
 
+
 Make sure it's clear what research question you are doing each operation for!
 
-<!------------------------- Start your work below ----------------------------->
+<!------------------------- Now I want to study the diameter differences between two genus. With the help of summary data, I will try to visualize. 
 
-<!----------------------------------------------------------------------------->
+```{r}
+#Question1: 
+#Task 1: summary
+summary(Acer_subset$diameter)
+#300 diameter looks like outliers so to remove the outlier, lets create new #subset whose diameter is less than 100
+Acer_subsetnew <- filter(Acer_subset, diameter < 100)
+summary(Acer_subsetnew$diameter)
+summary(Quercus_subset$diameter)
+```
+Now to graph and make histogram of diameter of Acer genus, we need to decide number of bins, we already know that the minimum diameter is 0 and maximum is 305. Now, since the gap is high, we need more bins. But let's try with small number of bins (just to see what happens!) 
+```{r}
+#Task 2: graphing with less number of bins
+ggplot(Acer_subsetnew, aes(x=diameter))+
+  geom_histogram(bins = 6)
+
+
+
+```
+We see that the information is not clear so lets use the formula we know <number of bins=(max-min)/width> 
+```{r}
+ggplot(Acer_subsetnew, aes(x=diameter))+
+  geom_histogram(bins = 10)
+```
+That didn't work either, lets try with Struge's rule: log2(3607) + 1 = 13
+```{r}
+
+ggplot(Acer_subsetnew, aes(x=diameter))+
+  geom_histogram(bins= 13)
+```
+Let's do next now!
+```{r}
+#QUESTION NUMBER 2
+#Task 1: summarize
+summary(Quercus_subset$diameter)
+```
+When we summarized the diameter of quercus, we could see diamter of 300 which is impossible! So certainly there is some outlier! Let's explore them!
+
+```{r}
+#Question number 2
+#Task 2: visualizing
+ggplot(data=Quercus_subset, aes(x=curb, y=diameter)) + geom_boxplot() + geom_count()
+```
+Can you see that one point which is completely out of range? That is outlier and needs to be removed.
+Now let's do next question: Is the diameter of Acer significantly affected by curb? Let us set a null hypothesis that the mean diameter of tress  of having curb and not having curb is same.  
+```{r}
+#Question 3
+#Task 1: summarize
+t.test(Quercus_subset$diameter~Quercus_subset$curb, var.equal = FALSE)
+
+
+
+
+```
+
+Since the p-value of our test (2.2e-16) is less than alpha=0.05, we reject the null hypothesis of the test. This means we have sufficient evidence to say that the mean diameter of Quercus trees between having curb and not having curb is different.
+```{r}
+#Task 2: graph
+
+#ggplot(Quercus_subset, aes(Quercus_subset$curb, Quercus_subset$diameter) + #geom_boxplot(outlier.color = "red", outlier.shape = 8, outlier.size = 4))
+#Alternatively, you can also use the following commands 
+boxplot(Quercus_subset$diameter~Quercus_subset$curb)
+
+```
+We can see that the average diameter of the Quercus not having curbs is slightly more than the ones which have curb.
+Now lets move to the 4th question: Since the height is given as categorical variable and y variable is diameter which is continuous variable, linear regression model is to be done:
+```{r}
+#Question 4
+#Task1: summary
+?lm()
+model = lm(vancouver_trees$diameter~vancouver_trees$height_range_id)
+summary(model)
+```
+From this we can see that the relationship of diameters is significant to each height range class. 
 
 ### 1.2 (3 points)
+```{r}
+#question4: task 2: graphing
+# I want to group the diameter according to height class 
+#And plot graph which shows height class in x axis and average diameter of the class for each class in y axis
+groupeddiameter <- vancouver_trees %>%
+group_by(height_range_id) %>%
+summarize(a = mean(diameter))
+ggplot(data= groupeddiameter, aes(x= height_range_id, y= a)) +
+geom_bar(stat= "identity")
 
+  
+
+
+```
+We can see that the diameter is increasing with increase in height classes in general except for the last height class. 
+
+---------------------------------------------->
 Based on the operations that you've completed, how much closer are you to answering your research questions? Think about what aspects of your research questions remain unclear. Can your research questions be refined, now that you've investigated your data a bit more? Which research questions are yielding interesting results?
 
-<!-------------------------- Start your work below ---------------------------->
+<!-------------------------- Start your work below
+I am very close to my research questions. I tried to find summary and visualize in order to deal with the research questions. 
 
+The interesting results are that the average diameter of the Quercus not having curbs is slightly more than the ones which have curb. Hence curbs are not good for plant growth for Quercus trees. 
+---------------------------->
 <!----------------------------------------------------------------------------->
 
 ### Attribution
