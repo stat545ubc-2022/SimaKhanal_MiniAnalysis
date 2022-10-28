@@ -1,6 +1,6 @@
 ---
 title: "Mini Data Analysis Milestone 2"
-output: html_document
+output: git_document
 ---
 
 *To complete this milestone, you can edit [this `.rmd` file](https://raw.githubusercontent.com/UBC-STAT/stat545.stat.ubc.ca/master/content/mini-project/mini-project-2.Rmd) directly. Fill in the sections that are commented out with `<!--- start your work here--->`. When you are done, make sure to knit to an `.md` file by changing the output in the YAML header to `github_document`, before submitting a tagged release on canvas.*
@@ -96,6 +96,8 @@ vancouver_subset_tidy <- vancouver_subset_untidy %>%
 print(vancouver_subset_tidy)
 ```
 First of all, I changed the tidy data set to untidy as the question wants me to do so. For this I used pivot_wider() function and named the untidy dataset as vancouver_subset_untidy. In this I made new columns with Yes and No response of the assigned variable. The data set became untidy as the assigned responses Y and N are not variables. Thus, to take the untidy data back to its tidy form, I used pivot_longer() function where I reordered the columns using select() and joined the other columns as they were in the original data using everything(). The position of column is shifted but it doesn't matter as the data set is already tidy.  
+
+
 <!----------------------------------------------------------------------------->
 
 ### 2.3 (7.5 points)
@@ -117,8 +119,10 @@ Now, you should be more familiar with your data, and also have made progress in 
 Explain your decision for choosing the above two research questions.
 
 <!--------------------------- Start your work below --------------------------->
+
 In the previous analysis 1, I compared the diameter of two genus, but now I want to see the diameter difference between 4 species.
-Next, this time I want to further see if the diameter of plants with curbs are affected by season of plantation. For this, I want to extract months of plantation and group them into winter and summer season and see if the diameter in the trees differ with respect to season of plantation.  
+Next, this time I want to further see if the diameter of plants with curbs are affected by season of plantation. For this, I want to extract months of plantation and see if the diameter in the trees differ with respect to month of plantation.
+
 <!----------------------------------------------------------------------------->
 
 Now, try to choose a version of your data that you think will be appropriate to answer these 2 questions. Use between 4 and 8 functions that we've covered so far (i.e. by filtering, cleaning, tidy'ing, dropping irrelevant columns, etc.).
@@ -139,7 +143,11 @@ print(meandiameter)
 
 
 ```
+
+
 We can see that the average diameter of genus Quercus is greater than Acer followed by Zelkova and the least average diameter is of Pyrus.
+
+
 ```{r}
 #Is the diameter of plant with curb affected by plantation month?
 library(lubridate)
@@ -160,6 +168,7 @@ vancouver_trees_curb %>%
 
 ```
 We can see that the trees with curb planted in August has highest diameter.
+
 <!----------------------------------------------------------------------------->
 
 # Task 2: Special Data Types (10)
@@ -168,17 +177,22 @@ For this exercise, you'll be choosing two of the three tasks below -- both tasks
 
 But first, tasks 1 and 2 below ask you to modify a plot you made in a previous milestone. The plot you choose should involve plotting across at least three groups (whether by facetting, or using an aesthetic like colour). Place this plot below (you're allowed to modify the plot if you'd like). If you don't have such a plot, you'll need to make one. Place the code for your plot below.
 
+
 <!-------------------------- Start your work below ---------------------------->
+
 I don't have any plots as mentioned above in earlier milestone, hence I would like to create a plot like that first.
+I have divided diameters into thin, medium and thick. I also divided the months of plantation into early and late.
+
 ```{r}
 #Creating a plot 
-# Create a categorical variable with 3 groups for height class (1 to 4 : small, 3 to 6 as medium and 6 to 10 as tall)
+# Create a categorical variable with 3 groups for diameter excluding the outliers:
 
-#Classes of height
+#Classes of diameter
+
 diameter_class <- numeric()
 diameter_class[vancouver_trees_curb$diameter < 4.5] <- "thin"
 diameter_class[vancouver_trees_curb$diameter >= 4.5 & vancouver_trees_curb$diameter < 6] <- "medium"
-diameter_class[vancouver_trees_curb$diameter >= 6] <- "thick"
+diameter_class[vancouver_trees_curb$diameter >= 16] <- "thick"
 diameter_class <- as.factor(diameter_class)
 
 #Season category
@@ -200,7 +214,7 @@ ggplot(a, aes(x = diameter_class, ..count..)) + geom_bar(aes(fill= season)) + la
 ```
 
 
-<!---------------------------------------------------------------------------I have divided diameters into thin, medium and thick. I also divided the months of plantation into early and late. Then I did plot.-->
+<!----------------------------------------------------------------------------->
 
 Now, choose two of the following tasks.
 
@@ -219,15 +233,21 @@ Now, choose two of the following tasks.
 
         -   For example, you could say something like "Investigating the day of the week might be insightful because penguins don't work on weekends, and so may respond differently".
 
-<!-------------------------- Start your work below
----------------------------->
+<!-------------------------- Start your work below ---------------------------->
+
 **Task Number**: 1
+
 ```{r}
 
 ggplot(a, aes(x=fct_reorder(diameter_class, diameter), ..count..)) +   geom_bar(aes(fill=season)) + labs(x = "diameter classes")
 ```
-<!---------------------------------------------------------------------------In my previous plot, the diameter class was shown in the order medium, thin and thick which was not my target. I used forcats package to reorder the diameter class in an order from thin to thick in the later plot. We can see that there is no observable differences of diameter despite of early and late plantation.-->
-<!--------------------------I will now try find the plantation month with the given data. ---------------------------->
+I have divided diameters into thin, medium and thick. I also divided the months of plantation into early and late. 
+
+<!----------------------------------------------------------------------------->
+
+
+<!-------------------------- Start your work below ---------------------------->
+
 
 **Task Number**: 2 (3rd)
 
@@ -237,8 +257,12 @@ vancouver_trees_curb <- filter(vancouver_trees,curb=="Y")
 datedata <- vancouver_trees_curb$date_planted
 m <- month(as.POSIXlt(datedata, format="%Y-%m-%d"))
 vancouver_trees_curb$month_plantation <- m
+head(vancouver_trees_curb)
 ```
-<!--This may be useful to see if the plantation month have roles in growth of trees. --------------------------------------------------------------------------->
+
+I created a column with only the months of plantation extracted from the date (yy-mm-dd) This may be useful to see if the plantation month have roles in growth of trees. 
+
+<!----------------------------------------------------------------------------->
 
 # Task 3: Modelling
 
@@ -246,7 +270,7 @@ vancouver_trees_curb$month_plantation <- m
 
 Pick a research question, and pick a variable of interest (we'll call it "Y") that's relevant to the research question. Indicate these.
 
-<!-------------------------- ---------------------------->
+<!-------------------------- Start your work below ---------------------------->
 
 **Research Question**: I want to find if diameter of plant with curb is influenced by plantation season.
 
@@ -264,7 +288,7 @@ Fit a model or run a hypothesis test that provides insight on this variable with
     -   You could test whether the mean of Y equals 0 using `t.test()`, or maybe the mean across two groups are different using `t.test()`, or maybe the mean across multiple groups are different using `anova()` (you may have to pivot your data for the latter two).
     -   You could use `lm()` to test for significance of regression.
 
-<!-------------------------- 
+<!-------------------------- Start your work below ----------------------------->
 ```{r}
 
 m = t.test(a$diameter~a$season)
@@ -283,7 +307,7 @@ Produce something relevant from your fitted model: either predictions on Y, or a
 -   Your code should either output a tibble (in which case you should indicate the column that contains the thing you're looking for), or the thing you're looking for itself.
 -   Obtain your results using the `broom` package if possible. If your model is not compatible with the broom function you're needing, then you can obtain your results by some other means, but first indicate which broom function is not compatible.
 
-<!-------------------------- Start your work below
+<!-------------------------- Start your work below ------------>
 ```{r}
 
 model <- tidy(m) %>%
@@ -291,7 +315,8 @@ mutate_if(is.numeric, round, 3)
 model
 ```
 
------------->
+
+I used tidy to get the results of my modelling in a data frame where I can easily see the values of t statistics and p value and interpret them easily.
 
 <!----------------------------------------------------------------------------->
 
@@ -322,7 +347,7 @@ result_summary <-
             range_diam = range(diameter))
 table<- data.frame(result_summary)
 dir.create(here::here("Output_MDA2"))
-write_csv(table, here("Milestone2_data", "exported_table.csv"))
+write_csv(table, here("Output_MDA2", "exported_table.csv"))
 ```
 
 <!----------------------------------------------------------------------------->
@@ -333,8 +358,14 @@ Write your model object from Task 3 to an R binary file (an RDS), and load it ag
 
 -   The same robustness and reproducibility criteria as in 3.1 apply here.
 
-<!-------------------------- I used tidy to get the results of my modelling in a data frame where I can easily see the values of t statistics and p value and interpret them easily.------------------------>
+<!---------- Start your work below ------------------------------------>
 
+```{r}
+saveRDS(model, here("Output_MDA2", "model.RDS"))
+model_read <- readRDS(here("Output_MDA2", "model.RDS"))
+model_read
+```
+<!---------------------------------------------------------------------->
 
 
 # Tidy Repository
