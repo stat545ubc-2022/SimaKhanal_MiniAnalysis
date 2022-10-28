@@ -42,6 +42,11 @@ Begin by loading your data and the tidyverse package below:
 ```{r, message = FALSE}
 library(datateachr) # <- might contain the data you picked!
 library(tidyverse)
+library(dplyr)
+library(broom)
+library(forcats)
+library(here)
+
 
 ```
 
@@ -309,6 +314,7 @@ Produce something relevant from your fitted model: either predictions on Y, or a
 
 <!-------------------------- Start your work below ------------>
 ```{r}
+library(broom)
 m = t.test(a$diameter~a$season)
 model <- tidy(m) %>%
 mutate_if(is.numeric, round, 3)
