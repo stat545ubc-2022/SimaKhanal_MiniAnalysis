@@ -309,6 +309,7 @@ Produce something relevant from your fitted model: either predictions on Y, or a
 
 <!-------------------------- Start your work below ------------>
 ```{r}
+m = t.test(a$diameter~a$season)
 model <- tidy(m) %>%
 mutate_if(is.numeric, round, 3)
 model
